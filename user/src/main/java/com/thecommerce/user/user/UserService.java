@@ -72,7 +72,7 @@ public class UserService {
      * @throws RuntimeException 데이터베이스 조회 중 오류가 발생한 경우
      */
     @Transactional(rollbackFor = Exception.class)
-    public UserRegistrationStatus selectUserName(String userName) {
+    public UserRegistrationStatus checkDuplicateUserName(String userName) {
         try {
             Optional<User> userOptional = userRepository.findUserByUserName(userName);
             return userOptional.isPresent() ? UserRegistrationStatus.ALREADY_EXIST_USER_NAME
