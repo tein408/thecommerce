@@ -69,7 +69,7 @@ public class UserController {
             return new ResponseEntity<>("email length error", HttpStatus.BAD_REQUEST);
         }
 
-        if (userService.selectEmail(userEmail).equals("exist")) {
+        if (userService.checkDuplicateEmail(userEmail).equals(UserRegistrationStatus.ALREADY_EXIST_EMAIL)) {
             return new ResponseEntity<>("email exist", HttpStatus.CONFLICT);
         }
 
@@ -78,7 +78,7 @@ public class UserController {
             return new ResponseEntity<>("userName length error", HttpStatus.BAD_REQUEST);
         }
 
-        if (userService.selectUserName(userName).equals("exist")) {
+        if (userService.checkDuplicateUserName(userName).equals(UserRegistrationStatus.ALREADY_EXIST_USER_NAME)) {
             return new ResponseEntity<>("userName exist", HttpStatus.CONFLICT);
         }
 
@@ -102,8 +102,8 @@ public class UserController {
      *         리턴합니다.
      */
     private ResponseEntity<?> saveUser(UserDTO userDTO) {
-        String result = userService.save(userDTO);
-        if (result.equals("ok")) {
+        UserRegistrationStatus result = userService.save(userDTO);
+        if (result.equals(UserRegistrationStatus.OK)) {
             return new ResponseEntity<>("CREATED", HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>("SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
