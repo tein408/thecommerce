@@ -1,12 +1,16 @@
 package com.thecommerce.user.user;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.thecommerce.user.user.userDTO.UserDTO;
+import com.thecommerce.user.user.userDTO.UserListDTO;
 import com.thecommerce.user.user.userDTO.UpdateUserDTO;
 
 import lombok.RequiredArgsConstructor;
@@ -32,10 +36,12 @@ public class UserService {
     public UserRegistrationStatus save(UserDTO userDTO) {
         try {
             User user = new User();
+            user.setUserId(userDTO.getUserId());
             user.setPassword(encoder.encode(userDTO.getPassword()) + "");
             user.setEmail(userDTO.getEmail());
             user.setUserName(userDTO.getUserName());
             user.setPhoneNumber(userDTO.getPhoneNumber());
+            user.setCreateDate(LocalDateTime.now());
             userRepository.save(user);
             return UserRegistrationStatus.OK;
         } catch (Exception e) {
@@ -124,4 +130,22 @@ public class UserService {
         }
     }
 
+    /**
+     * 입력된 페이지 및 정렬 조건에 따라 회원 목록을 조회합니다.
+     * 
+     * @param pageable 페이지 및 정렬 정보
+     * @return 회원 목록 페이지
+     */
+    public Page<UserListDTO> getUserList(Pageable pageable) {
+        Page<User> result = userRepository.findAll(pageable);
+        return result.map(user -> {
+            return new UserListDTO(
+                    user.getUserIndex(),
+                    user.getUserId(),
+                    user.getUserName(),
+                    user.getEmail(),
+                    user.getPhoneNumber(),
+                    user.getCreateDate());
+        });
+    }
 }

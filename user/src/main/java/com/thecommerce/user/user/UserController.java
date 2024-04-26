@@ -2,16 +2,22 @@ package com.thecommerce.user.user;
 
 import java.util.regex.Pattern;
 
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import com.thecommerce.user.user.userDTO.UserDTO;
+import com.thecommerce.user.user.userDTO.UserListDTO;
 import com.thecommerce.user.user.userDTO.UpdateUserDTO;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -129,13 +135,14 @@ public class UserController {
      * 회원 아이디를 통해 userName, password, PhoneNumber를 수정합니다.
      *
      * @param UpdateUserDTO userDTO 수정할 회원정보를 넘겨줍니다.
-     * @param String userId 회원 아이디를 받아 수정하고자 하는 회원의 정보를 확인합니다.
+     * @param String        userId 회원 아이디를 받아 수정하고자 하는 회원의 정보를 확인합니다.
      * @return 회원 정보 수정 성공 시 HttpStatus.OK, 유효성 검사 실패 시 HttpStatus.BAD_REQUEST,
      *         서버 에러 시 HttpStatus.INTERNAL_SERVER_ERROR를 반환합니다.
      */
     @Operation(summary = "회원 정보 수정", description = "회원 정보 수정 메서드입니다.")
     @PutMapping("/{loginId}")
-    public ResponseEntity<?> updateUserInfo(@RequestBody UpdateUserDTO userDTO, @PathVariable("loginId") String loginId) {
+    public ResponseEntity<?> updateUserInfo(@RequestBody UpdateUserDTO userDTO,
+            @PathVariable("loginId") String loginId) {
         try {
             log.info("=============== user information update start ===============");
 
@@ -194,6 +201,44 @@ public class UserController {
         }
 
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 입력된 회원들의 정보를 목록으로 조회합니다.
+     * 
+     * @param page     페이지 번호
+     * @param pageSize 한 페이지에 표시될 수 있는 최대 회원 수
+     * @param sort     정렬 방식 (가입일순 또는 이름순)
+     * @return 회원 목록 정보
+     */
+    @GetMapping("/list")
+    public ResponseEntity<?> getUserList(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String createDateSort,
+            @RequestParam(required = false) String userNameSort) {
+        try {
+            Sort sort = null;
+            if (createDateSort != null && userNameSort != null) {
+                sort = Sort.by(
+                        Sort.Order.desc("createDate"),
+                        Sort.Order.asc("userName")
+                );
+            } else if (createDateSort != null) {
+                sort = Sort.by(Sort.Order.desc("createDate"));
+            } else if (userNameSort != null) {
+                sort = Sort.by(Sort.Order.asc("userName"));
+            } else {
+                sort = Sort.by(Sort.Order.desc("createDate"));
+            }
+
+            PageRequest pageable = PageRequest.of(page, pageSize, sort);
+            Page<UserListDTO> userList = userService.getUserList(pageable);
+            return ResponseEntity.ok(userList);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>("SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }
