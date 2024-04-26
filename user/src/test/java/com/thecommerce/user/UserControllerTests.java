@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.AfterEach;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -168,10 +169,11 @@ class UserControllerTests {
     }
 
     @Test
+    @DisplayName("비밀번호는 500자 이상인 경우 에러를 반환한다.")
     void testPasswordLengthTooLong() throws Exception {
         StringBuilder passwordTooLong = new StringBuilder("Password!1");
-        for (int i = 0; i < 502; i++) {
-            passwordTooLong.append("Password!1");
+        for (int i = 0; i < 491; i++) {
+            passwordTooLong.append(1);
         }
         UserDTO userDTO = new UserDTO(null, "userId", "userName", "test@example.com", passwordTooLong.toString(), "010-1234-5678",
                 null);
@@ -185,10 +187,11 @@ class UserControllerTests {
     }
 
     @Test
+    @DisplayName("이메일은 500자 이상인 경우 에러를 반환한다.")
     void testEmailLengthTooLong() throws Exception {
         StringBuilder emailTooLong = new StringBuilder("user1");
-        for (int i = 0; i < 502; i++) {
-            emailTooLong.append("user1");
+        for (int i = 0; i < 496; i++) {
+            emailTooLong.append(1);
         }
         emailTooLong.append("@email.com");
         UserDTO userDTO = new UserDTO(null, "userId", "userName", emailTooLong.toString(), "Password!123", "010-1234-5678",
@@ -301,12 +304,18 @@ class UserControllerTests {
     void testGetUserListSuccess() throws Exception {
         List<UserListDTO> userList = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
-            userList.add(new UserListDTO((long) i, "user" + i, "user" + i, "email" + i + "@example.com",
-                    "010-1234-5678", LocalDateTime.now()));
+            userList.add(
+                new UserListDTO(
+                    (long) i, 
+                    "user" + i,
+                    "user" + i,
+                    "email" + i + "@example.com",
+                    "010-1234-5678",
+                    LocalDateTime.now()
+                )
+            );
         }
-
         Page<UserListDTO> userPage = new PageImpl<>(userList);
-
         when(userService.getUserList(PageRequest.of(0, 10)))
                 .thenReturn(userPage);
 
@@ -330,6 +339,7 @@ class UserControllerTests {
             userRepository.save(setUpUser);
         }
 
+        // Assert: API에서 회원이름 순으로 정렬하여 10개씩 조회한 2페이지에는 20번대 유저가 나와야한다.
         mockMvc.perform(MockMvcRequestBuilders.get("/api/user/list")
                 .param("page", String.valueOf(1))
                 .param("pageSize", String.valueOf(10))
@@ -356,6 +366,7 @@ class UserControllerTests {
             userRepository.save(setUpUser);
         }
 
+        // Assert: API에서 가입일 순으로 정렬하여 10개씩 조회한 2페이지에는 10번대 유저가 역순으로 나와야한다.
         mockMvc.perform(MockMvcRequestBuilders.get("/api/user/list")
                 .param("page", String.valueOf(1))
                 .param("pageSize", String.valueOf(10))
@@ -382,6 +393,7 @@ class UserControllerTests {
             userRepository.save(setUpUser);
         }
 
+        // Assert: API에서 가입일 순과 회원이름순으로 정렬하여 10개씩 조회한 2페이지에는 10번대 유저가 역순으로 나와야한다.
         mockMvc.perform(MockMvcRequestBuilders.get("/api/user/list")
                 .param("page", String.valueOf(1))
                 .param("pageSize", String.valueOf(10))
