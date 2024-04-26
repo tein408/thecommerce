@@ -87,8 +87,8 @@ public class UserController {
             return new ResponseEntity<>("password length error", HttpStatus.BAD_REQUEST);
         }
 
-        String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$";
-        if (Pattern.matches(regex, userDTO.getPassword())) {
+        String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])\\S{8,}$";
+        if (!Pattern.matches(regex, userDTO.getPassword())) {
             return new ResponseEntity<>("password combination error", HttpStatus.BAD_REQUEST);
         }
 
