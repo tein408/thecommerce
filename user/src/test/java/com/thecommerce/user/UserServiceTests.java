@@ -1,6 +1,7 @@
 package com.thecommerce.user;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -91,6 +92,54 @@ class UserServiceTests {
         assertEquals(2, result.getTotalElements());
         assertEquals("user1", result.getContent().get(0).getUserId());
         assertEquals("User2", result.getContent().get(1).getUserName());
+    }
+
+    @Test
+    void checkDuplicateEmailThrowsException() {
+        UserRepository userRepository = mock(UserRepository.class);
+        when(userRepository.findUserByEmail("test@example.com")).thenThrow(new RuntimeException("SERVER_ERROR"));
+        UserService userService = new UserService(userRepository);
+
+        UserRegistrationStatus result = userService.checkDuplicateEmail("test@example.com");
+
+        assertEquals(UserRegistrationStatus.FAIL, result);
+    }
+
+    @Test
+    void checkDuplicateUserNameThrowsException() {
+        UserRepository userRepository = mock(UserRepository.class);
+        when(userRepository.findUserByUserName("testUser")).thenThrow(new RuntimeException("SERVER_ERROR"));
+        UserService userService = new UserService(userRepository);
+
+        assertThrows(RuntimeException.class, () -> userService.checkDuplicateUserName("testUser"));
+    }
+
+    @Test
+    void updateUserThrowsException() {
+        UserRepository userRepository = mock(UserRepository.class);
+        when(userRepository.findUserByUserId("testUser")).thenReturn(Optional.of(new User()));
+        when(userRepository.save(any(User.class))).thenThrow(new RuntimeException("SERVER_ERROR"));
+        UserService userService = new UserService(userRepository);
+
+        UpdateUserDTO updateUserDTO = new UpdateUserDTO();
+        updateUserDTO.setPassword("newPassword!123");
+
+        UserUpdateStatus result = userService.updateUser(updateUserDTO, "testUser");
+
+        assertEquals(UserUpdateStatus.SERVER_ERROR, result);
+    }
+
+    @Test
+    void testSaveUserThrowsException() {
+        UserDTO userDTO = new UserDTO(null, "userId", "user", "test@example.com", "Password!123", "010-1234-5678", null);
+
+        UserRepository userRepository = mock(UserRepository.class);
+        when(userRepository.save(any(User.class))).thenThrow(new RuntimeException("SERVER_ERROR"));
+        UserService userService = new UserService(userRepository);
+
+        UserRegistrationStatus result = userService.save(userDTO);
+
+        assertEquals(UserRegistrationStatus.FAIL, result);
     }
 
 }

@@ -489,4 +489,18 @@ class UserControllerTests {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.content[9].userName", is("list10")));
     }
 
+    @Test
+    void testSaveUserFail() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        UserDTO userDTO = new UserDTO();
+        String userDTOJson = objectMapper.writeValueAsString(userDTO);
+
+        when(userService.save(userDTO)).thenReturn(UserRegistrationStatus.FAIL);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/user/join")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userDTOJson))
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
+    }
+
 }
