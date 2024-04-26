@@ -19,7 +19,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@Table(name = "User")
+@Table(name = "Users")
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
