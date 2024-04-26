@@ -31,8 +31,12 @@ public class User {
     @Id
     @NotNull
     @GeneratedValue
+    @Column(name = "userIndex", unique = true)
+    private Long userIndex;
+
+    @NotNull
     @Column(name = "userId", unique = true)
-    private Long userId;
+    private String userId;
 
     @Column(name = "userName", unique = true)
     private String userName;

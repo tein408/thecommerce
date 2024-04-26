@@ -37,7 +37,7 @@ class UserControllerTests {
 
     @Test
     void testJoinSuccess() throws Exception {
-        UserDTO userDTO = new UserDTO(null, "userName", "test@example.com", "Password!123", "010-1234-5678", null);
+        UserDTO userDTO = new UserDTO(null, "userId", "userName", "test@example.com", "Password!123", "010-1234-5678", null);
         ObjectMapper objectMapper = new ObjectMapper();
         String userDTOJson = objectMapper.writeValueAsString(userDTO);
 
@@ -49,7 +49,7 @@ class UserControllerTests {
 
     @Test
     void testJoinWithExistingEmail() throws Exception {
-        UserDTO userDTO = new UserDTO(null, "userName", "existing@example.com", "Password!123", "010-1234-5678", null);
+        UserDTO userDTO = new UserDTO(null, "userId", "userName", "existing@example.com", "Password!123", "010-1234-5678", null);
         ObjectMapper objectMapper = new ObjectMapper();
         String userDTOJson = objectMapper.writeValueAsString(userDTO);
 
@@ -61,7 +61,7 @@ class UserControllerTests {
 
     @Test
     void testJoinWithInvalidEmail() throws Exception {
-        UserDTO userDTO = new UserDTO(null, "userName", "invalid_email", "Password!123", "010-1234-5678", null);
+        UserDTO userDTO = new UserDTO(null, "userId", "userName", "invalid_email", "Password!123", "010-1234-5678", null);
         ObjectMapper objectMapper = new ObjectMapper();
         String userDTOJson = objectMapper.writeValueAsString(userDTO);
 
@@ -73,7 +73,7 @@ class UserControllerTests {
 
     @Test
     void testInvalidPhoneNumberFormat() throws Exception {
-        UserDTO userDTO = new UserDTO(null, "user2", "test2@example.com", "Password!123", "010-1234-56890", null);
+        UserDTO userDTO = new UserDTO(null, "userId", "user2", "test2@example.com", "Password!123", "010-1234-56890", null);
         ObjectMapper objectMapper = new ObjectMapper();
         String userDTOJson = objectMapper.writeValueAsString(userDTO);
 
@@ -85,7 +85,43 @@ class UserControllerTests {
 
     @Test
     void testInvalidPasswordFormat() throws Exception {
-        UserDTO userDTO = new UserDTO(null, "user3", "test3@example.com", "passwordinvalid", "010-1234-5689", null);
+        UserDTO userDTO = new UserDTO(null, "userId", "user3", "test3@example.com", "passwordinvalid", "010-1234-5689", null);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userDTOJson = objectMapper.writeValueAsString(userDTO);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/user/join")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userDTOJson))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    void testUserIdLengthTooShort() throws Exception {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setUserId("iam");
+        userDTO.setUserName("user1");
+        userDTO.setEmail("user1@email.com");
+        userDTO.setPhoneNumber("010-1234-568");
+        String passwordTooShort = "Password!123";
+        userDTO.setPassword(passwordTooShort);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userDTOJson = objectMapper.writeValueAsString(userDTO);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/user/join")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userDTOJson))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    void testUserIdLengthTooLong() throws Exception {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setUserId("userIduserIduserIduserIduserId");
+        userDTO.setUserName("user1");
+        userDTO.setEmail("user1@email.com");
+        userDTO.setPhoneNumber("010-1234-568");
+        String passwordTooShort = "Password!123";
+        userDTO.setPassword(passwordTooShort);
         ObjectMapper objectMapper = new ObjectMapper();
         String userDTOJson = objectMapper.writeValueAsString(userDTO);
 
@@ -98,6 +134,7 @@ class UserControllerTests {
     @Test
     void testPasswordLengthTooShort() throws Exception {
         UserDTO userDTO = new UserDTO();
+        userDTO.setUserId("userId");
         userDTO.setUserName("user1");
         userDTO.setEmail("user1@email.com");
         userDTO.setPhoneNumber("010-1234-568");
@@ -115,6 +152,7 @@ class UserControllerTests {
     @Test
     void testUserNameLengthTooShort() throws Exception {
         UserDTO userDTO = new UserDTO();
+        userDTO.setUserId("userId");
         userDTO.setUserName("1");
         userDTO.setEmail("user1@email.com");
         userDTO.setPhoneNumber("010-1234-568");
@@ -131,6 +169,7 @@ class UserControllerTests {
     @Test
     void testUserNameLengthTooLong() throws Exception {
         UserDTO userDTO = new UserDTO();
+        userDTO.setUserId("userId");
         userDTO.setUserName("username1username1");
         userDTO.setEmail("user1@email.com");
         userDTO.setPhoneNumber("010-1234-568");
@@ -147,6 +186,7 @@ class UserControllerTests {
     @Test
     void testPasswordLengthTooLong() throws Exception {
         UserDTO userDTO = new UserDTO();
+        userDTO.setUserId("userId");
         userDTO.setUserName("user1");
         userDTO.setEmail("user1@email.com");
         userDTO.setPhoneNumber("010-1234-568");
@@ -167,6 +207,7 @@ class UserControllerTests {
     @Test
     void testEmailLengthTooLong() throws Exception {
         UserDTO userDTO = new UserDTO();
+        userDTO.setUserId("userId");
         userDTO.setUserName("user1");
         userDTO.setPhoneNumber("010-1234-568");
         userDTO.setPassword("Password!123");
@@ -189,6 +230,7 @@ class UserControllerTests {
     void testDuplicateEmail() {
         String email = "test@example.com";
         UserDTO userDTO = new UserDTO();
+        userDTO.setUserId("userId");
         userDTO.setEmail(email);
         userDTO.setUserName("testuser");
         userDTO.setPassword("Passw0rd!");
