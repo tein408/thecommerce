@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.thecommerce.user.user.userDTO.UserDTO;
+import com.thecommerce.user.user.userDTO.UpdateUserDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -81,6 +82,45 @@ public class UserService {
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new RuntimeException("SERVER_ERROR");
+        }
+    }
+
+    /**
+     * 회원아이디를 통해 조회한 회원정보를 수정합니다.
+     *
+     * @param UpdateUserDTO userDTO
+     * @param String        userId
+     * @return 회원 정보 수정 성공 시 UserUpdateStatus.OK, 유효하지 않은 사용자인 경우
+     *         UserUpdateStatus.INVALID_USER,
+     *         서버 에러 시 UserUpdateStatus.SERVER_ERROR를 반환합니다.
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public UserUpdateStatus updateUser(UpdateUserDTO userDTO, String userId) {
+        Optional<User> optionalUser = userRepository.findUserByUserId(userId);
+        if (!optionalUser.isPresent()) {
+            return UserUpdateStatus.INVALID_USER;
+        }
+
+        User user = optionalUser.get();
+
+        if (userDTO.getPassword() != null) {
+            user.setPassword(encoder.encode(userDTO.getPassword()));
+        }
+
+        if (userDTO.getUserName() != null) {
+            user.setUserName(userDTO.getUserName());
+        }
+
+        if (userDTO.getPhoneNumber() != null) {
+            user.setPhoneNumber(userDTO.getPhoneNumber());
+        }
+
+        try {
+            userRepository.save(user);
+            return UserUpdateStatus.OK;
+        } catch (Exception e) {
+            log.info(e.getMessage());
+            return UserUpdateStatus.SERVER_ERROR;
         }
     }
 

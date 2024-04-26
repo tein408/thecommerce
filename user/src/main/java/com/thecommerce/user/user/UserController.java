@@ -5,11 +5,14 @@ import java.util.regex.Pattern;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import com.thecommerce.user.user.userDTO.UserDTO;
+import com.thecommerce.user.user.userDTO.UpdateUserDTO;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +29,8 @@ public class UserController {
      * 회원가입 : 유효성 검사 로직 수행 후 회원가입 로직을 수행합니다.
      * 
      * @param UserDTO userDTO
-     * @return 회원가입 성공시 HttpStatus.CREATED, 유효성 검사 실패시 HttpStatus.BAD_REQUEST를 리턴합니다.
+     * @return 회원가입 성공시 HttpStatus.CREATED, 유효성 검사 실패시 HttpStatus.BAD_REQUEST를
+     *         리턴합니다.
      */
     @Operation(summary = "회원가입", description = "회원가입 메서드입니다")
     @PostMapping(path = "/join")
@@ -74,13 +78,13 @@ public class UserController {
         if (userEmail.length() > 500) {
             return new ResponseEntity<>("email length error", HttpStatus.BAD_REQUEST);
         }
-        
+
         if (userService.checkDuplicateEmail(userEmail).equals(UserRegistrationStatus.ALREADY_EXIST_EMAIL)) {
             return new ResponseEntity<>("email exist", HttpStatus.CONFLICT);
         }
 
         String userName = userDTO.getUserName();
-        if (userName.length() < 1 || 8 < userName.length()) {
+        if (userName.length() < 2 || 8 < userName.length()) {
             return new ResponseEntity<>("userName length error", HttpStatus.BAD_REQUEST);
         }
 
@@ -119,6 +123,77 @@ public class UserController {
         } else {
             return new ResponseEntity<>("SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    /**
+     * 회원 아이디를 통해 userName, password, PhoneNumber를 수정합니다.
+     *
+     * @param UpdateUserDTO userDTO 수정할 회원정보를 넘겨줍니다.
+     * @param String userId 회원 아이디를 받아 수정하고자 하는 회원의 정보를 확인합니다.
+     * @return 회원 정보 수정 성공 시 HttpStatus.OK, 유효성 검사 실패 시 HttpStatus.BAD_REQUEST,
+     *         서버 에러 시 HttpStatus.INTERNAL_SERVER_ERROR를 반환합니다.
+     */
+    @Operation(summary = "회원 정보 수정", description = "회원 정보 수정 메서드입니다.")
+    @PutMapping("/{loginId}")
+    public ResponseEntity<?> updateUserInfo(@RequestBody UpdateUserDTO userDTO, @PathVariable("loginId") String loginId) {
+        try {
+            log.info("=============== user information update start ===============");
+
+            ResponseEntity<?> validationResponse = validateUpdateUserInfo(userDTO);
+            if (validationResponse.getStatusCode() != HttpStatus.OK) {
+                return validationResponse;
+            }
+
+            UserUpdateStatus updateStatus = userService.updateUser(userDTO, loginId);
+            if (updateStatus == UserUpdateStatus.OK) {
+                return new ResponseEntity<>("User information updated successfully", HttpStatus.OK);
+            } else if (updateStatus == UserUpdateStatus.INVALID_USER) {
+                return new ResponseEntity<>("Invalid user", HttpStatus.BAD_REQUEST);
+            } else {
+                return new ResponseEntity<>("Server error", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>("SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * 회원 정보 수정 시 userName, password, phoneNumber에 대해 유효성 검사를 합니다.
+     *
+     * @param UpdateUserDTO userDTO 확인할 정보를 넘겨줍니다.
+     * @return 유효성 검사 통과 시 HttpStatus.OK, 실패 시 적절한 HttpStatus와 에러 메시지를 반환합니다.
+     */
+    private ResponseEntity<?> validateUpdateUserInfo(UpdateUserDTO userDTO) {
+        if (userDTO.getPassword() != null) {
+            if (userDTO.getPassword().length() < 8 || 500 < userDTO.getPassword().length()) {
+                return new ResponseEntity<>("password length error", HttpStatus.BAD_REQUEST);
+            }
+
+            String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])\\S{8,}$";
+            if (!Pattern.matches(regex, userDTO.getPassword())) {
+                return new ResponseEntity<>("password combination error", HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        if (userDTO.getUserName() != null) {
+            if (userDTO.getUserName().length() < 2 || 8 < userDTO.getUserName().length()) {
+                return new ResponseEntity<>("userName length error", HttpStatus.BAD_REQUEST);
+            }
+
+            if (userService.checkDuplicateUserName(userDTO.getUserName())
+                    .equals(UserRegistrationStatus.ALREADY_EXIST_USER_NAME)) {
+                return new ResponseEntity<>("userName exist", HttpStatus.CONFLICT);
+            }
+        }
+
+        if (userDTO.getPhoneNumber() != null) {
+            if (!Pattern.matches("^\\d{2,3}-\\d{3,4}-\\d{4}$", userDTO.getPhoneNumber())) {
+                return new ResponseEntity<>("phone number format error", HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        return ResponseEntity.ok().build();
     }
 
 }
