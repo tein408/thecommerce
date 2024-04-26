@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
 import org.mockito.InjectMocks;
@@ -123,9 +125,38 @@ class UserControllerTests {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
-    @Test
-    void testInvalidPasswordFormat() throws Exception {
-        UserDTO userDTO = new UserDTO(null, "userId", "user3", "test3@example.com", "passwordinvalid", "010-1234-5689",
+    @ParameterizedTest
+    @ValueSource(strings = {"password", "invalidpassword", "Pass!1"})
+    void testInvalidPasswordFormat(String password) throws Exception {
+        UserDTO userDTO = new UserDTO(null, "userId", "user3", "test3@example.com", password, "010-1234-5689",
+                null);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userDTOJson = objectMapper.writeValueAsString(userDTO);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/user/join")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userDTOJson))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"a", "userIduserIduserIduserIduserIduserIduserId"})
+    void testInvalidUserIdLength(String userId) throws Exception {
+        UserDTO userDTO = new UserDTO(null, userId, "user1", "test@example.com", "Password!123", "010-1234-5678",
+                null);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userDTOJson = objectMapper.writeValueAsString(userDTO);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/user/join")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userDTOJson))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"a", "username1username1"})
+    void testInvalidUserNameLength(String userName) throws Exception {
+        UserDTO userDTO = new UserDTO(null, "userId", userName, "test@example.com", "Password!123", "010-1234-5678",
                 null);
         ObjectMapper objectMapper = new ObjectMapper();
         String userDTOJson = objectMapper.writeValueAsString(userDTO);
@@ -137,105 +168,13 @@ class UserControllerTests {
     }
 
     @Test
-    void testUserIdLengthTooShort() throws Exception {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setUserId("iam");
-        userDTO.setUserName("user1");
-        userDTO.setEmail("user1@email.com");
-        userDTO.setPhoneNumber("010-1234-568");
-        String passwordTooShort = "Password!123";
-        userDTO.setPassword(passwordTooShort);
-        ObjectMapper objectMapper = new ObjectMapper();
-        String userDTOJson = objectMapper.writeValueAsString(userDTO);
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/user/join")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(userDTOJson))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
-    }
-
-    @Test
-    void testUserIdLengthTooLong() throws Exception {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setUserId("userIduserIduserIduserIduserId");
-        userDTO.setUserName("user1");
-        userDTO.setEmail("user1@email.com");
-        userDTO.setPhoneNumber("010-1234-568");
-        String passwordTooShort = "Password!123";
-        userDTO.setPassword(passwordTooShort);
-        ObjectMapper objectMapper = new ObjectMapper();
-        String userDTOJson = objectMapper.writeValueAsString(userDTO);
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/user/join")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(userDTOJson))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
-    }
-
-    @Test
-    void testPasswordLengthTooShort() throws Exception {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setUserId("userId");
-        userDTO.setUserName("user1");
-        userDTO.setEmail("user1@email.com");
-        userDTO.setPhoneNumber("010-1234-568");
-        String passwordTooShort = "Pass!1";
-        userDTO.setPassword(passwordTooShort);
-        ObjectMapper objectMapper = new ObjectMapper();
-        String userDTOJson = objectMapper.writeValueAsString(userDTO);
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/user/join")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(userDTOJson))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
-    }
-
-    @Test
-    void testUserNameLengthTooShort() throws Exception {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setUserId("userId");
-        userDTO.setUserName("1");
-        userDTO.setEmail("user1@email.com");
-        userDTO.setPhoneNumber("010-1234-568");
-        userDTO.setPassword("Password!123");
-        ObjectMapper objectMapper = new ObjectMapper();
-        String userDTOJson = objectMapper.writeValueAsString(userDTO);
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/user/join")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(userDTOJson))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
-    }
-
-    @Test
-    void testUserNameLengthTooLong() throws Exception {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setUserId("userId");
-        userDTO.setUserName("username1username1");
-        userDTO.setEmail("user1@email.com");
-        userDTO.setPhoneNumber("010-1234-568");
-        userDTO.setPassword("Password!123");
-        ObjectMapper objectMapper = new ObjectMapper();
-        String userDTOJson = objectMapper.writeValueAsString(userDTO);
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/user/join")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(userDTOJson))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
-    }
-
-    @Test
     void testPasswordLengthTooLong() throws Exception {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setUserId("userId");
-        userDTO.setUserName("user1");
-        userDTO.setEmail("user1@email.com");
-        userDTO.setPhoneNumber("010-1234-568");
         StringBuilder passwordTooLong = new StringBuilder("Password!1");
         for (int i = 0; i < 502; i++) {
             passwordTooLong.append("Password!1");
         }
-        userDTO.setPassword(passwordTooLong.toString());
+        UserDTO userDTO = new UserDTO(null, "userId", "userName", "test@example.com", passwordTooLong.toString(), "010-1234-5678",
+                null);
         ObjectMapper objectMapper = new ObjectMapper();
         String userDTOJson = objectMapper.writeValueAsString(userDTO);
 
@@ -247,17 +186,13 @@ class UserControllerTests {
 
     @Test
     void testEmailLengthTooLong() throws Exception {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setUserId("userId");
-        userDTO.setUserName("user1");
-        userDTO.setPhoneNumber("010-1234-568");
-        userDTO.setPassword("Password!123");
         StringBuilder emailTooLong = new StringBuilder("user1");
         for (int i = 0; i < 502; i++) {
             emailTooLong.append("user1");
         }
         emailTooLong.append("@email.com");
-        userDTO.setEmail(emailTooLong.toString());
+        UserDTO userDTO = new UserDTO(null, "userId", "userName", emailTooLong.toString(), "Password!123", "010-1234-5678",
+                null);
         ObjectMapper objectMapper = new ObjectMapper();
         String userDTOJson = objectMapper.writeValueAsString(userDTO);
 
@@ -270,13 +205,8 @@ class UserControllerTests {
     @Test
     void testDuplicateEmail() {
         String email = "test@example.com";
-        UserDTO userDTO = new UserDTO();
-        userDTO.setUserId("userId");
-        userDTO.setEmail(email);
-        userDTO.setUserName("testuser");
-        userDTO.setPassword("Passw0rd!");
-        userDTO.setPhoneNumber("010-1234-5678");
-
+        UserDTO userDTO = new UserDTO(null, "userId", "userName", email, "Password!123", "010-1234-5678",
+        null);
         when(userService.checkDuplicateEmail(email)).thenReturn(UserRegistrationStatus.ALREADY_EXIST_EMAIL);
 
         ResponseEntity<?> response = userController.join(userDTO);
@@ -300,10 +230,11 @@ class UserControllerTests {
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
-    @Test
-    void testUpdateTooShortNameUserInfo() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"a", "username1username1"})
+    void testUpdateInvalidUserNameUserInfo(String userName) throws Exception {
         UpdateUserDTO updateUserDTO = new UpdateUserDTO();
-        updateUserDTO.setUserName("a");
+        updateUserDTO.setUserName(userName);
         ObjectMapper objectMapper = new ObjectMapper();
         String updateUserDTOJson = objectMapper.writeValueAsString(updateUserDTO);
 
@@ -314,20 +245,7 @@ class UserControllerTests {
     }
 
     @Test
-    void testUpdateTooLongNameUserInfo() throws Exception {
-        UpdateUserDTO updateUserDTO = new UpdateUserDTO();
-        updateUserDTO.setUserName("newNameNewName");
-        ObjectMapper objectMapper = new ObjectMapper();
-        String updateUserDTOJson = objectMapper.writeValueAsString(updateUserDTO);
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/user/initialUserId")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(updateUserDTOJson))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
-    }
-
-    @Test
-    void testUpdateDuplicateNameUserInfo() throws Exception {
+    void testUpdateDuplicateUserNameUserInfo() throws Exception {
         UpdateUserDTO updateUserDTO = new UpdateUserDTO();
         updateUserDTO.setUserName("name");
         ObjectMapper objectMapper = new ObjectMapper();
@@ -339,23 +257,11 @@ class UserControllerTests {
                 .andExpect(MockMvcResultMatchers.status().isConflict());
     }
 
-    @Test
-    void testUpdateTooShortPasswordUserInfo() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"Pass!1", "password", "username1username1"})
+    void testUpdateTooShortPasswordUserInfo(String password) throws Exception {
         UpdateUserDTO updateUserDTO = new UpdateUserDTO();
-        updateUserDTO.setPassword("Pass!1");
-        ObjectMapper objectMapper = new ObjectMapper();
-        String updateUserDTOJson = objectMapper.writeValueAsString(updateUserDTO);
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/user/initialUserId")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(updateUserDTOJson))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
-    }
-
-    @Test
-    void testUpdateInvalidPasswordFormatUserInfo() throws Exception {
-        UpdateUserDTO updateUserDTO = new UpdateUserDTO();
-        updateUserDTO.setPassword("password");
+        updateUserDTO.setPassword(password);
         ObjectMapper objectMapper = new ObjectMapper();
         String updateUserDTOJson = objectMapper.writeValueAsString(updateUserDTO);
 
