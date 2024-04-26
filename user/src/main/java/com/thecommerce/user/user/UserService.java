@@ -27,7 +27,7 @@ public class UserService {
     /**
      * 사용자 정보를 저장하여 회원가입을 처리합니다.
      *
-     * @param userDTO 저장할 사용자 정보를 담고 있는 UserDTO 객체
+     * @param userDTO 회원 정보
      * @return 회원가입 처리 결과를 나타내는 UserRegistrationStatus 열거형
      *         - OK: 회원가입이 성공한 경우
      *         - FAIL: 회원가입 처리 중 오류가 발생한 경우
@@ -94,8 +94,8 @@ public class UserService {
     /**
      * 회원아이디를 통해 조회한 회원정보를 수정합니다.
      *
-     * @param UpdateUserDTO userDTO
-     * @param String        userId
+     * @param userDTO 회원 정보
+     * @param userId  회원 아이디
      * @return 회원 정보 수정 성공 시 UserUpdateStatus.OK, 유효하지 않은 사용자인 경우
      *         UserUpdateStatus.INVALID_USER,
      *         서버 에러 시 UserUpdateStatus.SERVER_ERROR를 반환합니다.
