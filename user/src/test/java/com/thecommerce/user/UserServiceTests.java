@@ -63,7 +63,6 @@ class UserServiceTests {
         UserRepository userRepository = mock(UserRepository.class);
         when(userRepository.findUserByUserId("testUser")).thenReturn(Optional.of(new User()));
         UserService userService = new UserService(userRepository);
-
         UpdateUserDTO updateUserDTO = new UpdateUserDTO();
         updateUserDTO.setPassword("newPassword!123");
         updateUserDTO.setUserName("new");
@@ -81,11 +80,9 @@ class UserServiceTests {
         userList.add(new User(1L, "user1", "User1", "user1@example.com", "010-1111-1111", null, LocalDateTime.now()));
         userList.add(new User(2L, "user2", "User2", "user2@example.com", "010-2222-2222", null, LocalDateTime.now()));
         Page<User> userPage = new PageImpl<>(userList);
-        when(userRepository.findAll(any(Pageable.class))).thenReturn(userPage);
-
         UserService userService = new UserService(userRepository);
-
         Pageable pageable = Pageable.unpaged();
+        when(userRepository.findAll(any(Pageable.class))).thenReturn(userPage);
 
         Page<UserListDTO> result = userService.getUserList(pageable);
 
@@ -97,8 +94,8 @@ class UserServiceTests {
     @Test
     void checkDuplicateEmailThrowsException() {
         UserRepository userRepository = mock(UserRepository.class);
-        when(userRepository.findUserByEmail("test@example.com")).thenThrow(new RuntimeException("SERVER_ERROR"));
         UserService userService = new UserService(userRepository);
+        when(userRepository.findUserByEmail("test@example.com")).thenThrow(new RuntimeException("SERVER_ERROR"));
 
         UserRegistrationStatus result = userService.checkDuplicateEmail("test@example.com");
 
@@ -120,7 +117,6 @@ class UserServiceTests {
         when(userRepository.findUserByUserId("testUser")).thenReturn(Optional.of(new User()));
         when(userRepository.save(any(User.class))).thenThrow(new RuntimeException("SERVER_ERROR"));
         UserService userService = new UserService(userRepository);
-
         UpdateUserDTO updateUserDTO = new UpdateUserDTO();
         updateUserDTO.setPassword("newPassword!123");
 
@@ -132,7 +128,6 @@ class UserServiceTests {
     @Test
     void testSaveUserThrowsException() {
         UserDTO userDTO = new UserDTO(null, "userId", "user", "test@example.com", "Password!123", "010-1234-5678", null);
-
         UserRepository userRepository = mock(UserRepository.class);
         when(userRepository.save(any(User.class))).thenThrow(new RuntimeException("SERVER_ERROR"));
         UserService userService = new UserService(userRepository);
