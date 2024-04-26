@@ -23,7 +23,7 @@ class UserServiceTests {
 
     @Test
     void testSaveUser() {
-        UserDTO userDTO = new UserDTO(null, "test_user", "test@example.com", "password123", null);
+        UserDTO userDTO = new UserDTO(null, "test_user", "test@example.com", "password123", "010-1234-5678", null);
 
         UserRegistrationStatus result = userService.save(userDTO);
         assertEquals(UserRegistrationStatus.OK, result);

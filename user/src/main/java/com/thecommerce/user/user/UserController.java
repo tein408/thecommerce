@@ -26,8 +26,7 @@ public class UserController {
      * 회원가입 : 유효성 검사 로직 수행 후 회원가입 로직을 수행합니다.
      * 
      * @param UserDTO userDTO
-     * @return 회원가입 성공시 HttpStatus.CREATED, 유효성 검사 실패시 HttpStatus.BAD_REQUEST를
-     *         리턴합니다.
+     * @return 회원가입 성공시 HttpStatus.CREATED, 유효성 검사 실패시 HttpStatus.BAD_REQUEST를 리턴합니다.
      */
     @Operation(summary = "회원가입", description = "회원가입 메서드입니다")
     @PostMapping(path = "/join")
@@ -53,7 +52,7 @@ public class UserController {
     }
 
     /**
-     * 전달된 userDTO를 통해 email, nickname, password가 유효한 값인지 확인합니다.
+     * 전달된 userDTO를 통해 email, nickname, password, phoneNumber가 유효한 값인지 확인합니다.
      * 
      * @param userDTO
      * @return email 혹은 nickname이 중복인 경우 HttpStatus.CONFLICT,
@@ -91,6 +90,11 @@ public class UserController {
         String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$";
         if (Pattern.matches(regex, userDTO.getPassword())) {
             return new ResponseEntity<>("password combination error", HttpStatus.BAD_REQUEST);
+        }
+
+        String phoneNumber = userDTO.getPhoneNumber();
+        if (phoneNumber == null || !Pattern.matches("^\\d{2,3}-\\d{3,4}-\\d{4}$", phoneNumber)) {
+            return new ResponseEntity<>("phone number format error", HttpStatus.BAD_REQUEST);
         }
 
         return ResponseEntity.ok().build();

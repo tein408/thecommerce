@@ -21,7 +21,7 @@ class UserControllerTests {
 
     @Test
     void testJoinSuccess() throws Exception {
-        UserDTO userDTO = new UserDTO(null, "userName",  "test@example.com", "Password!123", null);
+        UserDTO userDTO = new UserDTO(null, "userName",  "test@example.com", "Password!123", "010-1234-5678", null);
         ObjectMapper objectMapper = new ObjectMapper();
         String userDTOJson = objectMapper.writeValueAsString(userDTO);
 
@@ -33,7 +33,7 @@ class UserControllerTests {
 
     @Test
     void testJoinWithExistingEmail() throws Exception {
-        UserDTO userDTO = new UserDTO(null, "userName",  "existing@example.com", "Password!123", null);
+        UserDTO userDTO = new UserDTO(null, "userName",  "existing@example.com", "Password!123", "010-1234-5678", null);
         ObjectMapper objectMapper = new ObjectMapper();
         String userDTOJson = objectMapper.writeValueAsString(userDTO);
 
@@ -45,7 +45,7 @@ class UserControllerTests {
 
     @Test
     void testJoinWithInvalidEmail() throws Exception {
-        UserDTO userDTO = new UserDTO(null, "userName", "invalid_email", "Password!123", null);
+        UserDTO userDTO = new UserDTO(null, "userName", "invalid_email", "Password!123", "010-1234-5678", null);
         ObjectMapper objectMapper = new ObjectMapper();
         String userDTOJson = objectMapper.writeValueAsString(userDTO);
 
@@ -54,4 +54,17 @@ class UserControllerTests {
                 .content(userDTOJson))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
+
+    @Test
+    void testInvalidPhoneNumberJoinSuccess() throws Exception {
+        UserDTO userDTO = new UserDTO(null, "userName",  "test@example.com", "Password!123", "010-1234-568", null);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userDTOJson = objectMapper.writeValueAsString(userDTO);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/user/join")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userDTOJson))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
 }

@@ -34,6 +34,7 @@ public class UserService {
             user.setPassword(encoder.encode(userDTO.getPassword()) + "");
             user.setEmail(userDTO.getEmail());
             user.setUserName(userDTO.getUserName());
+            user.setPhoneNumber(userDTO.getPhoneNumber());
             userRepository.save(user);
             return UserRegistrationStatus.OK;
         } catch (Exception e) {
