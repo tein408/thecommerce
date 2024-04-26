@@ -2,6 +2,12 @@ package com.thecommerce.user;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +23,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thecommerce.user.user.User;
@@ -25,6 +34,7 @@ import com.thecommerce.user.user.UserRegistrationStatus;
 import com.thecommerce.user.user.UserService;
 import com.thecommerce.user.user.UserRepository;
 import com.thecommerce.user.user.userDTO.UserDTO;
+import com.thecommerce.user.user.userDTO.UserListDTO;
 import com.thecommerce.user.user.userDTO.UpdateUserDTO;
 
 @SpringBootTest
@@ -276,7 +286,7 @@ class UserControllerTests {
     }
 
     @Test
-    void testUpdateUserInfoSuccess() throws Exception {   
+    void testUpdateUserInfoSuccess() throws Exception {
         UpdateUserDTO updateUserDTO = new UpdateUserDTO();
         updateUserDTO.setPassword("newPassword!123");
         updateUserDTO.setUserName("new");
@@ -380,4 +390,103 @@ class UserControllerTests {
                 .content(updateUserDTOJson))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
+
+    @Test
+    void testGetUserListSuccess() throws Exception {
+        List<UserListDTO> userList = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            userList.add(new UserListDTO((long) i, "user" + i, "user" + i, "email" + i + "@example.com",
+                    "010-1234-5678", LocalDateTime.now()));
+        }
+
+        Page<UserListDTO> userPage = new PageImpl<>(userList);
+
+        when(userService.getUserList(PageRequest.of(0, 10)))
+                .thenReturn(userPage);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/user/list")
+                .param("page", "1")
+                .param("size", "10"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    void testGetUserListSortByUserName() throws Exception {
+        userRepository.deleteAll();
+        for (int i = 10; i < 30; i++) {
+            User setUpUser = new User();
+            setUpUser.setUserId("list" + i);
+            setUpUser.setUserName("list" + i);
+            setUpUser.setEmail("list" + i + "@example.com");
+            setUpUser.setPassword("Password!123");
+            setUpUser.setPhoneNumber("010-1234-5678");
+            setUpUser.setCreateDate(LocalDateTime.now());
+            userRepository.save(setUpUser);
+        }
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/user/list")
+                .param("page", String.valueOf(1))
+                .param("pageSize", String.valueOf(10))
+                .param("userNameSort", "userNameSort"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content", hasSize(10)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].userName", is("list20")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[1].userName", is("list21")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[2].userName", is("list22")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[9].userName", is("list29")));
+    }
+
+    @Test
+    void testGetUserListSortByCreateDate() throws Exception {
+        userRepository.deleteAll();
+        for (int i = 10; i < 30; i++) {
+            User setUpUser = new User();
+            setUpUser.setUserId("list" + i);
+            setUpUser.setUserName("list" + i);
+            setUpUser.setEmail("list" + i + "@example.com");
+            setUpUser.setPassword("Password!123");
+            setUpUser.setPhoneNumber("010-1234-5678");
+            setUpUser.setCreateDate(LocalDateTime.now());
+            userRepository.save(setUpUser);
+        }
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/user/list")
+                .param("page", String.valueOf(1))
+                .param("pageSize", String.valueOf(10))
+                .param("createDateSort", "createDateSort"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content", hasSize(10)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].userName", is("list19")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[1].userName", is("list18")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[2].userName", is("list17")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[9].userName", is("list10")));
+    }
+
+    @Test
+    void testGetUserListSortByCreateDateAndUserName() throws Exception {
+        userRepository.deleteAll();
+        for (int i = 10; i < 30; i++) {
+            User setUpUser = new User();
+            setUpUser.setUserId("list" + i);
+            setUpUser.setUserName("list" + i);
+            setUpUser.setEmail("list" + i + "@example.com");
+            setUpUser.setPassword("Password!123");
+            setUpUser.setPhoneNumber("010-1234-5678");
+            setUpUser.setCreateDate(LocalDateTime.now());
+            userRepository.save(setUpUser);
+        }
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/user/list")
+                .param("page", String.valueOf(1))
+                .param("pageSize", String.valueOf(10))
+                .param("createDateSort", "createDateSort")
+                .param("userNameSort", "userNameSort"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content", hasSize(10)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].userName", is("list19")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[1].userName", is("list18")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[2].userName", is("list17")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[9].userName", is("list10")));
+    }
+
 }
