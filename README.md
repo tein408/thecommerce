@@ -17,8 +17,8 @@
 4. API 사용: API를 사용하여 회원가입, 정보 수정, 목록 조회 등의 기능을 이용할 수 있습니다.
 
 # API 문서
-API 문서는 Swagger를 통해 제공됩니다. 
-애플리케이션을 실행한 후 http://localhost:8080/swagger-ui/index.html로 접속하여 확인할 수 있습니다.
+API 문서는 Swagger를 통해 제공됩니다.  
+애플리케이션을 실행한 후 http://localhost:8080/swagger-ui/index.html 로 접속하여 확인할 수 있습니다.
 
 # 테이블 구조
 이 애플리케이션은 다음과 같은 테이블을 사용합니다:
@@ -34,16 +34,16 @@ API 문서는 Swagger를 통해 제공됩니다.
 |createDate|LocalDateTime|회원 가입 날짜|
 
 # 개발 환경
-Java 8
-Spring Boot 2.6.2
-Spring Data JPA 2.6.0
-Spring Security 5.6.1
-H2 Database 1.4.200
-Lombok 1.18.22
-Swagger 3.0.0
+Java 8   
+Spring Boot 2.6.2   
+Spring Data JPA 2.6.0   
+Spring Security 5.6.1   
+H2 Database 1.4.200   
+Lombok 1.18.22   
+Swagger 3.0.0   
 Slf4j 1.7.32
 
-# 테스트 커버리지 확인
+# Test Coverage 확인
 터미널에서 아래의 명령어를 순서대로 입력한 후 프로젝트 폴더 내의 
 `thecommerce/user/build/reports/jacoco/test/html/` 경로에서 `index.html` 을 실행하여 확인할 수 있습니다.
 ```bash
