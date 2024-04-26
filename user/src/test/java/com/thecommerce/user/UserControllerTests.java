@@ -175,7 +175,7 @@ class UserControllerTests {
         for (int i = 0; i < 491; i++) {
             passwordTooLong.append(1);
         }
-        UserDTO userDTO = new UserDTO(null, "userId", "userName", "test@example.com", passwordTooLong.toString(), "010-1234-5678",
+        UserDTO userDTO = new UserDTO(null, "userId", "user1", "test1@example.com", passwordTooLong.toString(), "010-1234-5678",
                 null);
         ObjectMapper objectMapper = new ObjectMapper();
         String userDTOJson = objectMapper.writeValueAsString(userDTO);
