@@ -12,13 +12,15 @@ import org.springframework.web.bind.annotation.RestController;
 import com.thecommerce.user.user.userDTO.UserDTO;
 
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/user")
 public class UserController {
-    private final UserService userService = null;
+    private final UserService userService;
 
     /**
      * 회원가입 : 유효성 검사 로직 수행 후 회원가입 로직을 수행합니다.
@@ -68,7 +70,7 @@ public class UserController {
         if (userEmail.length() > 500) {
             return new ResponseEntity<>("email length error", HttpStatus.BAD_REQUEST);
         }
-
+        
         if (userService.checkDuplicateEmail(userEmail).equals(UserRegistrationStatus.ALREADY_EXIST_EMAIL)) {
             return new ResponseEntity<>("email exist", HttpStatus.CONFLICT);
         }
