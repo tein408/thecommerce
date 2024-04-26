@@ -61,6 +61,11 @@ public class UserController {
      *         모든 유효성이 통과한 경우 HttpStatus 200을 리턴합니다.
      */
     private ResponseEntity<?> validateUser(UserDTO userDTO) {
+        String userId = userDTO.getUserId();
+        if (userId.length() < 4 || userId.length() > 20) {
+            return new ResponseEntity<>("user Id length error", HttpStatus.BAD_REQUEST);
+        }
+
         String userEmail = userDTO.getEmail();
         if (!Pattern.matches("^[a-zA-Z0-9+-\\_.]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", userEmail)) {
             return new ResponseEntity<>("email expression error", HttpStatus.BAD_REQUEST);
