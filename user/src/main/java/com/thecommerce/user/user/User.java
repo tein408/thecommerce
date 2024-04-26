@@ -56,7 +56,4 @@ public class User {
     @Column(name = "createDate")
     private LocalDateTime createDate;
 
-    @Column(name = "authNum")
-    private Integer authNum;
-
 }
