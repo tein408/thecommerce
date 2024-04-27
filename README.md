@@ -56,6 +56,8 @@ Slf4j 1.7.32
 ```
 Test Coverage는 92%입니다.
 
+<img width="1098" alt="image" src="https://github.com/tein408/thecommerce/assets/75615404/77cd2fec-3996-440a-a537-ef0858fd1070">
+
 # 프로젝트 구조
 프로젝트 구조는 아래와 같습니다.
 
