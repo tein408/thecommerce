@@ -52,6 +52,7 @@ Slf4j 1.7.32
 ./gradlew test
 ./gradlew check
 ```
+Test Coverage는 92%입니다.
 
 # 프로젝트 구조
 > 프로젝트 구조는 아래와 같습니다.
