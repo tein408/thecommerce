@@ -25,17 +25,18 @@ API 문서는 Swagger를 통해 제공됩니다.
 # 테이블 구조
 이 애플리케이션은 다음과 같은 테이블을 사용합니다:
 
-|컬럼명|type|설명|
-|------|---|---|
-|userIndex|Long|PK|
-|userId|String|회원 아이디|
-|userName|String|회원 이름|
-|email|String|이메일|
-|password|String|비밀번호|
-|phoneNumber|String|전화번호|
-|createDate|LocalDateTime|회원 가입 날짜|
+|컬럼명|TYPE|CONSTRAINTS|설명|
+|------|---|---|---|
+|userIndex|Long|PK||
+|userId|String|not Null, unique|회원 아이디|
+|userName|String|unique|회원 이름|
+|email|String|not Null, unique|이메일|
+|password|String|not Null|비밀번호|
+|phoneNumber|String||전화번호|
+|createDate|LocalDateTime||회원 가입 날짜|
 
 # 개발 환경
+```yml
 Java 8   
 Spring Boot 2.6.2   
 Spring Data JPA 2.6.0   
@@ -44,6 +45,7 @@ H2 Database 1.4.200
 Lombok 1.18.22   
 Swagger 3.0.0   
 Slf4j 1.7.32
+```
 
 # Test Coverage 확인
 터미널에서 아래의 명령어를 순서대로 입력한 후 프로젝트 폴더 내의 
@@ -55,7 +57,8 @@ Slf4j 1.7.32
 Test Coverage는 92%입니다.
 
 # 프로젝트 구조
-> 프로젝트 구조는 아래와 같습니다.
+프로젝트 구조는 아래와 같습니다.
+
 ```text
 user
 ┣ bin
