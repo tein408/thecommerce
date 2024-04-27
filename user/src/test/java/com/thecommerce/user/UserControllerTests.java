@@ -33,8 +33,8 @@ import org.springframework.data.domain.PageRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thecommerce.user.user.User;
 import com.thecommerce.user.user.UserController;
-import com.thecommerce.user.user.UserRegistrationStatus;
 import com.thecommerce.user.user.UserService;
+import com.thecommerce.user.user.status.UserRegistrationStatus;
 import com.thecommerce.user.user.UserRepository;
 import com.thecommerce.user.user.userDTO.UserDTO;
 import com.thecommerce.user.user.userDTO.UserListDTO;
@@ -127,7 +127,7 @@ class UserControllerTests {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"password", "invalidpassword", "Pass!1"})
+    @ValueSource(strings = { "password", "invalidpassword", "Pass!1" })
     void testInvalidPasswordFormat(String password) throws Exception {
         UserDTO userDTO = new UserDTO(null, "userId", "user3", "test3@example.com", password, "010-1234-5689",
                 null);
@@ -141,7 +141,7 @@ class UserControllerTests {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"a", "userIduserIduserIduserIduserIduserIduserId"})
+    @ValueSource(strings = { "a", "userIduserIduserIduserIduserIduserIduserId" })
     void testInvalidUserIdLength(String userId) throws Exception {
         UserDTO userDTO = new UserDTO(null, userId, "user1", "test@example.com", "Password!123", "010-1234-5678",
                 null);
@@ -155,7 +155,7 @@ class UserControllerTests {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"a", "username1username1"})
+    @ValueSource(strings = { "a", "username1username1" })
     void testInvalidUserNameLength(String userName) throws Exception {
         UserDTO userDTO = new UserDTO(null, "userId", userName, "test@example.com", "Password!123", "010-1234-5678",
                 null);
@@ -175,7 +175,8 @@ class UserControllerTests {
         for (int i = 0; i < 491; i++) {
             passwordTooLong.append(1);
         }
-        UserDTO userDTO = new UserDTO(null, "userId", "user1", "test1@example.com", passwordTooLong.toString(), "010-1234-5678",
+        UserDTO userDTO = new UserDTO(null, "userId", "user1", "test1@example.com", passwordTooLong.toString(),
+                "010-1234-5678",
                 null);
         ObjectMapper objectMapper = new ObjectMapper();
         String userDTOJson = objectMapper.writeValueAsString(userDTO);
@@ -194,7 +195,8 @@ class UserControllerTests {
             emailTooLong.append(1);
         }
         emailTooLong.append("@email.com");
-        UserDTO userDTO = new UserDTO(null, "userId", "userName", emailTooLong.toString(), "Password!123", "010-1234-5678",
+        UserDTO userDTO = new UserDTO(null, "userId", "userName", emailTooLong.toString(), "Password!123",
+                "010-1234-5678",
                 null);
         ObjectMapper objectMapper = new ObjectMapper();
         String userDTOJson = objectMapper.writeValueAsString(userDTO);
@@ -209,7 +211,7 @@ class UserControllerTests {
     void testDuplicateEmail() {
         String email = "test@example.com";
         UserDTO userDTO = new UserDTO(null, "userId", "userName", email, "Password!123", "010-1234-5678",
-        null);
+                null);
         when(userService.checkDuplicateEmail(email)).thenReturn(UserRegistrationStatus.ALREADY_EXIST_EMAIL);
 
         ResponseEntity<?> response = userController.join(userDTO);
@@ -234,7 +236,7 @@ class UserControllerTests {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"a", "username1username1"})
+    @ValueSource(strings = { "a", "username1username1" })
     void testUpdateInvalidUserNameUserInfo(String userName) throws Exception {
         UpdateUserDTO updateUserDTO = new UpdateUserDTO();
         updateUserDTO.setUserName(userName);
@@ -261,7 +263,7 @@ class UserControllerTests {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"Pass!1", "password", "username1username1"})
+    @ValueSource(strings = { "Pass!1", "password", "username1username1" })
     void testUpdateTooShortPasswordUserInfo(String password) throws Exception {
         UpdateUserDTO updateUserDTO = new UpdateUserDTO();
         updateUserDTO.setPassword(password);
@@ -305,15 +307,13 @@ class UserControllerTests {
         List<UserListDTO> userList = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
             userList.add(
-                new UserListDTO(
-                    (long) i, 
-                    "user" + i,
-                    "user" + i,
-                    "email" + i + "@example.com",
-                    "010-1234-5678",
-                    LocalDateTime.now()
-                )
-            );
+                    new UserListDTO(
+                            (long) i,
+                            "user" + i,
+                            "user" + i,
+                            "email" + i + "@example.com",
+                            "010-1234-5678",
+                            LocalDateTime.now()));
         }
         Page<UserListDTO> userPage = new PageImpl<>(userList);
         when(userService.getUserList(PageRequest.of(0, 10)))
@@ -355,6 +355,7 @@ class UserControllerTests {
     @Test
     void testGetUserListSortByCreateDate() throws Exception {
         userRepository.deleteAll();
+        LocalDateTime now = LocalDateTime.now().minusDays(40);
         for (int i = 10; i < 30; i++) {
             User setUpUser = new User();
             setUpUser.setUserId("list" + i);
@@ -362,7 +363,8 @@ class UserControllerTests {
             setUpUser.setEmail("list" + i + "@example.com");
             setUpUser.setPassword("Password!123");
             setUpUser.setPhoneNumber("010-1234-5678");
-            setUpUser.setCreateDate(LocalDateTime.now());
+            // 고정된 시간으로 생성일을 설정
+            setUpUser.setCreateDate(now.plusDays(i));
             userRepository.save(setUpUser);
         }
 
@@ -382,6 +384,7 @@ class UserControllerTests {
     @Test
     void testGetUserListSortByCreateDateAndUserName() throws Exception {
         userRepository.deleteAll();
+        LocalDateTime now = LocalDateTime.now().minusDays(40);
         for (int i = 10; i < 30; i++) {
             User setUpUser = new User();
             setUpUser.setUserId("list" + i);
@@ -389,7 +392,8 @@ class UserControllerTests {
             setUpUser.setEmail("list" + i + "@example.com");
             setUpUser.setPassword("Password!123");
             setUpUser.setPhoneNumber("010-1234-5678");
-            setUpUser.setCreateDate(LocalDateTime.now());
+            // 고정된 시간으로 생성일을 설정
+            setUpUser.setCreateDate(now.plusDays(i));
             userRepository.save(setUpUser);
         }
 
