@@ -51,3 +51,46 @@ Slf4j 1.7.32
 ./gradlew check
 ```
 
+# 프로젝트 구조
+> 프로젝트 구조는 아래와 같습니다.
+```text
+user
+┣ bin
+┣ build
+┣ gradle
+┣ src
+┃ ┣ main.java.com.thecommerce
+┃ ┃ ┗ user
+┃ ┃ ┃ ┣ config
+┃ ┃ ┃ ┃ ┣ SwaggerConfig.java
+┃ ┃ ┃ ┃ ┣ WebConfig.java
+┃ ┃ ┃ ┃ ┗ WebSecurityConfig.java
+┃ ┃ ┃ ┣ user
+┃ ┃ ┃ ┃ ┣ status
+┃ ┃ ┃ ┃ ┃ ┣ UserRegistrationStatus.java
+┃ ┃ ┃ ┃ ┃ ┗ UserUpdateStatus.java
+┃ ┃ ┃ ┃ ┣ userDTO
+┃ ┃ ┃ ┃ ┃ ┣ UpdateUserDTO.java
+┃ ┃ ┃ ┃ ┃ ┣ UserDTO.java
+┃ ┃ ┃ ┃ ┃ ┗ UserListDTO.java
+┃ ┃ ┃ ┃ ┣ User.java
+┃ ┃ ┃ ┃ ┣ UserController.java
+┃ ┃ ┃ ┃ ┣ UserRepository.java
+┃ ┃ ┃ ┃ ┗ UserService.java
+┃ ┃ ┃ ┗ UserApplication.java
+┃ ┃ ┗ resources
+┃ ┃ ┃ ┣ static
+┃ ┃ ┃ ┣ templates
+┃ ┃ ┃ ┗ application.yml
+┃ ┗ test
+┃ ┃ ┗ java.com.thecommerce
+┃ ┃ ┃ ┗ user
+┃ ┃ ┃ ┃ ┣ UserApplicationTests.java
+┃ ┃ ┃ ┃ ┣ UserControllerTests.java
+┃ ┃ ┃ ┃ ┗ UserServiceTests.java
+┣ build.gradle
+┣ gradle.properties
+┣ gradlew
+┣ gradlew.bat
+┗ settings.gradle
+```
