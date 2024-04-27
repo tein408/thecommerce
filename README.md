@@ -20,6 +20,8 @@
 API 문서는 Swagger를 통해 제공됩니다.  
 애플리케이션을 실행한 후 http://localhost:8080/swagger-ui/index.html 로 접속하여 확인할 수 있습니다.
 
+<img width="1442" alt="image" src="https://github.com/tein408/thecommerce/assets/75615404/2807eaca-3f66-494c-8300-735755e97556">
+
 # 테이블 구조
 이 애플리케이션은 다음과 같은 테이블을 사용합니다:
 
@@ -51,3 +53,46 @@ Slf4j 1.7.32
 ./gradlew check
 ```
 
+# 프로젝트 구조
+> 프로젝트 구조는 아래와 같습니다.
+```text
+user
+┣ bin
+┣ build
+┣ gradle
+┣ src
+┃ ┣ main.java.com.thecommerce
+┃ ┃ ┗ user
+┃ ┃ ┃ ┣ config
+┃ ┃ ┃ ┃ ┣ SwaggerConfig.java
+┃ ┃ ┃ ┃ ┣ WebConfig.java
+┃ ┃ ┃ ┃ ┗ WebSecurityConfig.java
+┃ ┃ ┃ ┣ user
+┃ ┃ ┃ ┃ ┣ status
+┃ ┃ ┃ ┃ ┃ ┣ UserRegistrationStatus.java
+┃ ┃ ┃ ┃ ┃ ┗ UserUpdateStatus.java
+┃ ┃ ┃ ┃ ┣ userDTO
+┃ ┃ ┃ ┃ ┃ ┣ UpdateUserDTO.java
+┃ ┃ ┃ ┃ ┃ ┣ UserDTO.java
+┃ ┃ ┃ ┃ ┃ ┗ UserListDTO.java
+┃ ┃ ┃ ┃ ┣ User.java
+┃ ┃ ┃ ┃ ┣ UserController.java
+┃ ┃ ┃ ┃ ┣ UserRepository.java
+┃ ┃ ┃ ┃ ┗ UserService.java
+┃ ┃ ┃ ┗ UserApplication.java
+┃ ┃ ┗ resources
+┃ ┃ ┃ ┣ static
+┃ ┃ ┃ ┣ templates
+┃ ┃ ┃ ┗ application.yml
+┃ ┗ test
+┃ ┃ ┗ java.com.thecommerce
+┃ ┃ ┃ ┗ user
+┃ ┃ ┃ ┃ ┣ UserApplicationTests.java
+┃ ┃ ┃ ┃ ┣ UserControllerTests.java
+┃ ┃ ┃ ┃ ┗ UserServiceTests.java
+┣ build.gradle
+┣ gradle.properties
+┣ gradlew
+┣ gradlew.bat
+┗ settings.gradle
+```
