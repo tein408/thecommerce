@@ -1,4 +1,4 @@
-package com.thecommerce.user.user;
+package com.thecommerce.user.user.status;
 
 public enum UserUpdateStatus {
     OK("OK"),            

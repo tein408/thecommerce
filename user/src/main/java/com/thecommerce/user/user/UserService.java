@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.thecommerce.user.user.userDTO.UserDTO;
 import com.thecommerce.user.user.userDTO.UserListDTO;
+import com.thecommerce.user.user.status.UserRegistrationStatus;
+import com.thecommerce.user.user.status.UserUpdateStatus;
 import com.thecommerce.user.user.userDTO.UpdateUserDTO;
 
 import lombok.RequiredArgsConstructor;
