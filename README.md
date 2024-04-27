@@ -20,6 +20,8 @@
 API 문서는 Swagger를 통해 제공됩니다.  
 애플리케이션을 실행한 후 http://localhost:8080/swagger-ui/index.html 로 접속하여 확인할 수 있습니다.
 
+<img width="1442" alt="image" src="https://github.com/tein408/thecommerce/assets/75615404/2807eaca-3f66-494c-8300-735755e97556">
+
 # 테이블 구조
 이 애플리케이션은 다음과 같은 테이블을 사용합니다:
 
